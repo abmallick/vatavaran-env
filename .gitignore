@@ -10,5 +10,4 @@ outputs/
 data/synthetic_dev/
 .python-version
 .DS_Store
-uv.lock
 openrca_env/data/Bank_filtered.zip
