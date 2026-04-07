@@ -6,6 +6,7 @@ build/
 .venv/
 .env
 *.egg
+uv.lock
 outputs/
 data/synthetic_dev/
 .python-version
