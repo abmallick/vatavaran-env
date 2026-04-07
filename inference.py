@@ -49,7 +49,7 @@ BENCHMARK = os.getenv("RCA_BENCHMARK", "vatavaran")
 RCA_TASK_ID = (os.getenv("RCA_TASK_ID") or "").strip() or None
 
 
-RCA_BASE_URL = "https://abmallick-vatavaran.hf.space"
+RCA_BASE_URL = "https://abmallick-vatavaran-env.hf.space"
 RCA_USE_BASE_URL = (os.getenv("RCA_USE_BASE_URL") or "true").lower() == "true"
 RCA_ENV_MODE = (os.getenv("RCA_ENV_MODE") or "client").strip().lower()
 RCA_MAX_STEPS = int(os.getenv("RCA_MAX_STEPS", "4"))

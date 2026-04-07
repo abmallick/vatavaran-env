@@ -1,7 +1,7 @@
 """
 Run inference across the selected default Bank tasks.
 
-Connects directly to https://abmallick-vatavaran.hf.space and iterates
+Connects directly to https://abmallick-vatavaran-env.hf.space and iterates
 the configured task IDs sequentially in a single process so the conversation
 log is preserved across all tasks (one reset at the very start, then one
 episode per task appended to the same log file).
@@ -23,7 +23,7 @@ from inference import (
     _run_episode,
 )
 
-HF_SPACE_URL = "https://abmallick-vatavaran.hf.space"
+HF_SPACE_URL = "https://abmallick-vatavaran-env.hf.space"
 
 # Task IDs aligned with the default inference list.
 TASK_IDS = [
