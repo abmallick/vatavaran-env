@@ -1,0 +1,11 @@
+data/Bank/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.git/
+.env
+outputs/
+*.txt
+!server/requirements.txt

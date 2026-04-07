@@ -1,0 +1,10 @@
+spec_version: 1
+name: vatavaran
+type: space
+runtime: fastapi
+app: vatavaran.server.app:app
+port: 8000
+tasks:
+  - id: Bank_00018
+  - id: Bank_00020
+  - id: Bank_00057

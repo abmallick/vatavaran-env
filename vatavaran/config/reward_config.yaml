@@ -1,0 +1,32 @@
+# Reward shaping parameters for the Vatavaran environment.
+
+code_execution:
+  success_reward: 0.01
+  error_penalty: -0.01
+
+step_efficiency:
+  enabled: true
+  penalty_per_step: -0.005
+
+exploration_bonus:
+  enabled: true
+  per_modality_bonus: 0.03
+  tracked_modalities:
+    - metric
+    - trace
+    - log
+  max_bonus: 0.09
+
+cross_validation:
+  enabled: true
+  bonus: 0.05
+  min_modalities: 2
+
+final_answer:
+  weight: 1.0
+  no_submission_reward: 0.0
+
+episode:
+  max_steps_easy: 15
+  max_steps_middle: 20
+  max_steps_hard: 25

@@ -1,0 +1,29 @@
+# Runtime and sandbox limits.
+
+sandbox:
+  output_token_limit: 16384
+  execution_timeout_sec: 60
+  blocked_imports:
+    - matplotlib
+    - seaborn
+  pre_init_code: |
+    import pandas as pd
+    pd.set_option("display.width", 427)
+    pd.set_option("display.max_columns", 10)
+  forbid_write_patterns:
+    - "to_csv\\("
+    - "to_json\\("
+    - "to_parquet\\("
+    - "to_excel\\("
+    - "open\\([^\\)]*,\\s*['\\\"][wax\\+]"
+
+# Task list paths are relative to repo root. Override with VATAVARAN_TASKS_FILE.
+# dataset_root is required: telemetry CSVs live under <dataset_root>/telemetry/<YYYY_MM_DD>/.
+# Override with VATAVARAN_DATASET_ROOT.
+tasks:
+  path: data/Bank_filtered/queries.csv
+  format: csv
+  default_system: Bank_filtered
+  dataset_root: data/Bank_filtered
+  telemetry_dates:
+    - "2021_03_09"
