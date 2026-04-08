@@ -320,7 +320,7 @@ class VatavaranEnvironment(Environment):
             success, result = self._sandbox.execute(action.content)
             self._modalities_explored.update(self._detect_modalities(action.content))
             self._modalities_explored.update(self._detect_modalities(result))
-            reward = self._reward_engine.on_code_execution(success)
+            reward = self._reward_engine("code_execution", success=success)
             if not success:
                 error = result
 
@@ -328,7 +328,7 @@ class VatavaranEnvironment(Environment):
             success, result = self._sandbox.list_files(action.content)
             self._modalities_explored.update(self._detect_modalities(action.content))
             self._modalities_explored.update(self._detect_modalities(result))
-            reward = self._reward_engine.on_list_files()
+            reward = self._reward_engine("list_files")
             if not success:
                 error = result
 
@@ -337,7 +337,11 @@ class VatavaranEnvironment(Environment):
                 action.content, self._current_task.get("scoring_points", "")
             )
             score = float(evaluation["score"])
-            reward = self._reward_engine.on_submit(score, self._modalities_explored)
+            reward = self._reward_engine(
+                "submit",
+                eval_score=score,
+                modalities_explored=self._modalities_explored,
+            )
             done = True
             self._state.last_score = score
             self._last_grader_result = {
@@ -353,11 +357,13 @@ class VatavaranEnvironment(Environment):
             success = False
             error = f"Unsupported action_type: {action.action_type}"
             result = error
-            reward = self._reward_engine.on_code_execution(False)
+            reward = self._reward_engine("code_execution", success=False)
 
         if not done and self._state.step_count >= self._max_steps:
             done = True
-            timeout_reward = self._reward_engine.on_max_steps(self._modalities_explored)
+            timeout_reward = self._reward_engine(
+                "max_steps", modalities_explored=self._modalities_explored
+            )
             reward += timeout_reward
             if not result:
                 result = "Maximum steps reached before submit_answer."

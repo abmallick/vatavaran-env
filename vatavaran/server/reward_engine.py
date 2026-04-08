@@ -15,23 +15,54 @@ class RewardEngine:
     def _clamp01(value: float) -> float:
         return min(max(value, 0.01), 0.99)
 
-    def step_penalty(self) -> float:
+    def _step_penalty(self) -> float:
         step_cfg = self.config.get("step_efficiency", {})
         if not step_cfg.get("enabled", True):
             return 0.0
         return float(step_cfg.get("penalty_per_step", 0.0))
 
-    def on_code_execution(self, success: bool) -> float:
-        code_cfg = self.config.get("code_execution", {})
-        base = (
-            float(code_cfg.get("success_reward", 0.0))
-            if success
-            else float(code_cfg.get("error_penalty", 0.0))
-        )
-        return base + self.step_penalty()
+    def __call__(self, event: str, **context: object) -> float:
+        if event == "code_execution":
+            success = bool(context.get("success", False))
+            code_cfg = self.config.get("code_execution", {})
+            base = (
+                float(code_cfg.get("success_reward", 0.0))
+                if success
+                else float(code_cfg.get("error_penalty", 0.0))
+            )
+            return base + self._step_penalty()
 
-    def on_list_files(self) -> float:
-        return self.step_penalty()
+        if event == "list_files":
+            return self._step_penalty()
+
+        if event == "submit":
+            eval_score = float(context.get("eval_score", 0.0))
+            modalities_explored = context.get("modalities_explored", ())
+            if not isinstance(modalities_explored, Iterable):
+                raise ValueError("modalities_explored must be an iterable of strings")
+            final_cfg = self.config.get("final_answer", {})
+            weighted_eval = float(final_cfg.get("weight", 1.0)) * eval_score
+            reward = (
+                weighted_eval
+                + self._exploration_bonus(modalities_explored)
+                + self._cross_validation_bonus(modalities_explored)
+                + self._step_penalty()
+            )
+            return self._clamp01(reward)
+
+        if event == "max_steps":
+            modalities_explored = context.get("modalities_explored", ())
+            if not isinstance(modalities_explored, Iterable):
+                raise ValueError("modalities_explored must be an iterable of strings")
+            final_cfg = self.config.get("final_answer", {})
+            reward = (
+                float(final_cfg.get("no_submission_reward", 0.0))
+                + self._exploration_bonus(modalities_explored)
+                + self._cross_validation_bonus(modalities_explored)
+            )
+            return self._clamp01(reward)
+
+        raise ValueError(f"Unsupported reward event: {event}")
 
     def _exploration_bonus(self, modalities_explored: Iterable[str]) -> float:
         cfg = self.config.get("exploration_bonus", {})
@@ -54,26 +85,6 @@ class RewardEngine:
             if len(set(modalities_explored)) >= min_modalities
             else 0.0
         )
-
-    def on_submit(self, eval_score: float, modalities_explored: Iterable[str]) -> float:
-        final_cfg = self.config.get("final_answer", {})
-        weighted_eval = float(final_cfg.get("weight", 1.0)) * float(eval_score)
-        reward = (
-            weighted_eval
-            + self._exploration_bonus(modalities_explored)
-            + self._cross_validation_bonus(modalities_explored)
-            + self.step_penalty()
-        )
-        return self._clamp01(reward)
-
-    def on_max_steps(self, modalities_explored: Iterable[str]) -> float:
-        final_cfg = self.config.get("final_answer", {})
-        reward = (
-            float(final_cfg.get("no_submission_reward", 0.0))
-            + self._exploration_bonus(modalities_explored)
-            + self._cross_validation_bonus(modalities_explored)
-        )
-        return self._clamp01(reward)
 
     def max_steps_for_difficulty(self, difficulty: str) -> int:
         episode_cfg = self.config.get("episode", {})
