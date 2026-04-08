@@ -6,8 +6,8 @@ app: vatavaran.server.app:app
 port: 8000
 tasks:
   - id: Bank_00018
-    grader: RewardEngine
+    grader: vatavaran.server.reward_engine:RewardEngine
   - id: Bank_00020
-    grader: RewardEngine
+    grader: vatavaran.server.reward_engine:RewardEngine
   - id: Bank_00057
-    grader: RewardEngine
+    grader: vatavaran.server.reward_engine:RewardEngine
