@@ -13,7 +13,7 @@ Optional
 - RCA_BENCHMARK    Label for [START] line (default: vatavaran).
 - RCA_MAX_STEPS    Upper bound on steps per episode (default: 32), capped by env max_steps.
 - RCA_SEED         Optional int passed to reset(seed=...).
-- RCA_TASK_ID      Optional task id override; if unset, /reset decides task.
+- RCA_TASK_IDS     Comma-separated task ids to run sequentially (required).
 - RCA_MESSAGE_TIMEOUT_S  Max seconds to wait for each env WebSocket reply (default: 600).
 - RCA_WS_PING_INTERVAL   WebSocket keepalive ping interval in seconds (default: 60). Set to
                          "none" to disable client pings (can avoid keepalive timeouts on very
@@ -46,15 +46,14 @@ API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
 MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK = os.getenv("RCA_BENCHMARK", "vatavaran")
-RCA_TASK_ID = (os.getenv("RCA_TASK_ID") or "").strip() or None
 
 
 RCA_BASE_URL = "https://abmallick-vatavaran-env.hf.space"
 RCA_USE_BASE_URL = (os.getenv("RCA_USE_BASE_URL") or "true").lower() == "true"
 RCA_ENV_MODE = (os.getenv("RCA_ENV_MODE") or "client").strip().lower()
-RCA_MAX_STEPS = int(os.getenv("RCA_MAX_STEPS", "4"))
+RCA_MAX_STEPS = int(os.getenv("RCA_MAX_STEPS", "5"))
 RCA_SEED = os.getenv("RCA_SEED")
-
+RCA_TASK_IDS = ["Bank_00018", "Bank_00020", "Bank_00057", "Bank_00021", "Bank_00022", "Bank_00023"]
 
 def _parse_message_timeout_s() -> float:
     return float(os.getenv("RCA_MESSAGE_TIMEOUT_S", "600"))
@@ -96,6 +95,11 @@ def _resolve_log_path(raw_path: str) -> str:
 
 
 LOG_CONVERSATION_PATH = _resolve_log_path(_RAW_LOG_CONVERSATION_PATH)
+
+
+def _task_ids_to_run() -> list[str]:
+    """Resolve required task ids from RCA_TASK_IDS."""
+    return RCA_TASK_IDS
 
 ALLOWED_ACTIONS = frozenset({"list_files", "execute_code", "submit_answer"})
 
@@ -630,9 +634,11 @@ async def main() -> None:
 
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY or "missing-key")
     env = await _build_env()
+    task_ids = _task_ids_to_run()
 
     try:
-        await _run_episode(client, env, RCA_TASK_ID)
+        for task_id in task_ids:
+            await _run_episode(client, env, task_id)
     finally:
         try:
             await env.close()

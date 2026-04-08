@@ -14,3 +14,12 @@ tasks:
   - id: Bank_00057
     entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
     grader: vatavaran.server.reward_engine:RewardEngine
+  - id: Bank_00021
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
+    grader: vatavaran.server.reward_engine:RewardEngine
+  - id: Bank_00022
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
+    grader: vatavaran.server.reward_engine:RewardEngine
+  - id: Bank_00023
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
+    grader: vatavaran.server.reward_engine:RewardEngine
