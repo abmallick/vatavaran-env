@@ -6,8 +6,11 @@ app: vatavaran.server.app:app
 port: 8000
 tasks:
   - id: Bank_00018
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
     grader: vatavaran.server.reward_engine:RewardEngine
   - id: Bank_00020
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
     grader: vatavaran.server.reward_engine:RewardEngine
   - id: Bank_00057
+    entry_point: vatavaran.server.rca_environment:VatavaranEnvironment
     grader: vatavaran.server.reward_engine:RewardEngine
